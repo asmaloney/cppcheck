@@ -366,7 +366,6 @@ public:
           argDef(NULL),
           token(NULL),
           arg(NULL),
-          start(NULL),
           functionScope(NULL),
           type(eFunction),
           access(Public),
@@ -395,7 +394,6 @@ public:
     const Token *argDef;   // function argument start '(' in class definition
     const Token *token;    // function name token in implementation
     const Token *arg;      // function argument start '('
-    const Token *start;    // function start '{'
     Scope *functionScope;  // scope of function body
     std::list<Variable> argumentList; // argument list
     Type type;             // constructor, destructor, ...
@@ -585,7 +583,7 @@ private:
     friend class Scope;
 
     void addClassFunction(Scope **info, const Token **tok, const Token *argStart);
-    Function* addGlobalFunctionDecl(Scope*& scope, const Token*& tok, const Token *argStart, const Token* funcStart);
+    Function* addGlobalFunctionDecl(Scope*& scope, const Token *argStart, const Token* funcStart);
     Function* addGlobalFunction(Scope*& scope, const Token*& tok, const Token *argStart, const Token* funcStart);
     void addNewFunction(Scope **info, const Token **tok);
     bool isFunction(const Token *tok, const Scope* outerScope, const Token **funcStart, const Token **argStart) const;

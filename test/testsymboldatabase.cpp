@@ -102,6 +102,7 @@ private:
         TEST_CASE(classWithFriend);
 
         TEST_CASE(parseFunctionCorrect);
+        TEST_CASE(parseFunctionDeclarationCorrect);
 
         TEST_CASE(hasGlobalVariables1);
         TEST_CASE(hasGlobalVariables2);
@@ -109,6 +110,7 @@ private:
 
         TEST_CASE(functionArgs1);
         TEST_CASE(functionArgs2);
+        TEST_CASE(functionArgs3);
 
         TEST_CASE(namespaces1);
         TEST_CASE(namespaces2);
@@ -691,6 +693,13 @@ private:
         ASSERT(tokenizer.getFunctionTokenByName("if") == NULL);
     }
 
+    void parseFunctionDeclarationCorrect() {
+        GET_SYMBOL_DB("void func();\n"
+                      "int bar() {}\n"
+                      "void func() {}")
+        ASSERT_EQUALS(3, db->findScopeByName("func")->classStart->linenr());
+    }
+
     void hasGlobalVariables1() {
         GET_SYMBOL_DB("int i;\n")
 
@@ -784,6 +793,12 @@ private:
         ASSERT_EQUALS(2UL, a->dimensions().size());
         ASSERT_EQUALS(0UL, a->dimension(0));
         ASSERT_EQUALS(4UL, a->dimension(1));
+    }
+
+    void functionArgs3() {
+        GET_SYMBOL_DB("void f(int i,) { }"); // Don't crash
+        const Variable *a = db->getVariableFromVarId(1);
+        ASSERT_EQUALS("i", a->nameToken()->str());
     }
 
     void namespaces1() {

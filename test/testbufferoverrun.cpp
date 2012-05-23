@@ -110,6 +110,7 @@ private:
         TEST_CASE(array_index_40); // loop variable calculation, taking address
         TEST_CASE(array_index_41); // structs with the same name
         TEST_CASE(array_index_42);
+        TEST_CASE(array_index_43); // struct with array
         TEST_CASE(array_index_multidim);
         TEST_CASE(array_index_switch_in_for);
         TEST_CASE(array_index_for_in_for);   // FP: #2634
@@ -301,9 +302,6 @@ private:
         ASSERT_EQUALS("", errout.str());
     }
 
-
-
-
     void sizeof1() {
         check("static void f()\n"
               "{\n"
@@ -341,8 +339,6 @@ private:
         ASSERT_EQUALS("", errout.str());
     }
 
-
-
     void array_index_1() {
         check("void f()\n"
               "{\n"
@@ -358,6 +354,25 @@ private:
               "    return str[16];\n"
               "}\n");
         ASSERT_EQUALS("[test.cpp:4]: (error) Array 'str[16]' index 16 out of bounds\n", errout.str());
+
+        // test stack array
+        check("int f()\n"
+              "{\n"
+              "   int x[ 3 ] = { 0, 1, 2 };\n"
+              "   int y;\n"
+              "   y = x[ 4 ];\n"
+              "   return y;\n"
+              "}\n");
+        ASSERT_EQUALS("[test.cpp:5]: (error) Array 'x[3]' index 4 out of bounds\n", errout.str());
+
+        check("int f()\n"
+              "{\n"
+              "   int x[ 3 ] = { 0, 1, 2 };\n"
+              "   int y;\n"
+              "   y = x[ 2 ];\n"
+              "   return y;\n"
+              "}\n");
+        ASSERT_EQUALS("", errout.str());
     }
 
 
@@ -1372,6 +1387,37 @@ private:
               "  p[0] = 0;\n"
               "  p[9] = 9;\n"
               "  delete [] p;\n"
+              "}\n");
+        ASSERT_EQUALS("", errout.str());
+    }
+
+    void array_index_43() { // #3838
+
+        check("int f( ) \n"
+              "{\n"
+              "	struct {\n"
+              "		int arr[ 3 ];\n"
+              "	} var[ 1 ];\n"
+              "   int y;\n"
+              "   var[ 0 ].arr[ 0 ] = 0;\n"
+              "   var[ 0 ].arr[ 1 ] = 1;\n"
+              "   var[ 0 ].arr[ 2 ] = 2;\n"
+              "   y = var[ 0 ].arr[ 3 ];\n"
+              "   return y;\n"
+              "}\n");
+        TODO_ASSERT_EQUALS("[test.cpp:10]: (error) Array 'var[0].arr[3]' index 3 out of bounds\n","", errout.str());
+
+        check("int f( ) \n"
+              "{\n"
+              "	struct {\n"
+              "		int arr[ 3 ];\n"
+              "	} var[ 1 ];\n"
+              "   int y;\n"
+              "   var[ 0 ].arr[ 0 ] = 0;\n"
+              "   var[ 0 ].arr[ 1 ] = 1;\n"
+              "   var[ 0 ].arr[ 2 ] = 2;\n"
+              "   y = var[ 0 ].arr[ 2 ];\n"
+              "   return y;\n"
               "}\n");
         ASSERT_EQUALS("", errout.str());
     }
